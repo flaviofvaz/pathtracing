@@ -37,31 +37,28 @@ glm::vec3 PhongMaterial::reflect(const glm::vec3& incident, const glm::vec3& nor
     return 2.0f * glm::dot(normal, incident) * normal - incident;
 }
 
-glm::vec3 PhongMetal::Eval(const Scene* scene, const Hit* hit, const glm::vec3& rayOrigin) const
+inline float Random()
 {
-    static thread_local int depth = 0;
-    const int MAX_DEPTH = 5;
+    return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+}
 
-    // Stop recursion if we've reached maximum depth
-    if (depth >= MAX_DEPTH) {
-        return glm::vec3(0.0f);  // Return black for maximum depth
-    }
+glm::vec3 PhongMaterial::GetSample(float* pdf) const
+{
+    float rand1 = Random();
+    float rand2 = Random();
+    float rand1sqrt = glm::sqrt(rand1);
 
-    glm::vec3 p = hit->position;
-    glm::vec3 n = hit->normal;
-    glm::vec3 v = glm::normalize(rayOrigin - p);
+    float angle = glm::two_pi<float>() * rand2;
 
-    float R = r_zero + (1.0f - r_zero) * std::pow(1.0f - glm::dot(v, n), 5.0f);
-    
-    glm::vec3 c = (1.0f - R) * PhongMaterial::Eval(scene, hit, rayOrigin);
-    glm::vec3 r = glm::normalize(PhongMaterial::reflect(v, n));
-    
-    depth++;
-    Ray ray(p, r);
-    
-    // Trace reflected ray
-    c += R * scene->traceRay(ray);
-    depth--;
-    
-    return glm::clamp(c, 0.0f, 1.0f);
+    float x = rand1sqrt* glm::cos(angle);
+    float y = rand1sqrt * glm::sin(angle);
+    float z = glm::sqrt(1.0f - rand1);
+
+    *pdf = (glm::sqrt(1.0f - rand1)) / (glm::pi<float>());
+    return glm::vec3(x, y, z);
+}
+
+glm::vec3 PhongMaterial:: GetBRDF() const
+{
+    return diffuse / glm::pi<float>();
 }

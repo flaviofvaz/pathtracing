@@ -17,7 +17,8 @@ int main()
         // create film
         const int width = 800;
         const int height = 600;
-        const int numSamples = 30;
+        const int numSamples = 64;
+        const int dMax = 4;
         auto film = std::make_unique<Film>(glm::ivec2(width, height));
 
         // create camera
@@ -40,19 +41,11 @@ int main()
             10.0f                         // shininess
         );
 
-        // auto blueMaterial = std::make_unique<PhongMaterial>(
-        //     glm::vec3(0.1f, 0.1f, 0.8f),    // diffuse 
-        //     glm::vec3(0.5f, 0.5f, 0.5f),    // glossy 
-        //     glm::vec3(0.1f, 0.1f, 0.1f),    // ambient 
-        //     100.0f                          // shininess
-        // );
-
-        auto blueMaterial = std::make_unique<PhongMetal>(
+        auto blueMaterial = std::make_unique<PhongMaterial>(
             glm::vec3(0.1f, 0.1f, 0.8f),    // diffuse 
             glm::vec3(0.5f, 0.5f, 0.5f),    // glossy 
             glm::vec3(0.1f, 0.1f, 0.1f),    // ambient 
-            100.0f,                         // shininess
-            0.3f                            // r_zero
+            100.0f                         // shininess
         );
 
         auto floorMaterial = std::make_unique<PhongMaterial>(
@@ -64,33 +57,25 @@ int main()
 
         // add lights to the scene
         glm::vec3 lightPosition(2.0f, 4.0f, 3.0f);
-        auto pointLight = std::make_unique<PointLight>(
-            lightPosition,                      // position
-            glm::vec3(100.0f, 100.0f, 100.0f)   // power
+        
+        // Add area light
+        auto areaLight = std::make_unique<AreaLight>(
+            glm::vec3(0.0f, 4.0f, 0.0f),                    // position
+            glm::vec3(100.0f, 100.0f, 100.0f),   // power
+            glm::vec3(1.0f, 0.0f, 0.0f),         // ei (x-axis)
+            glm::vec3(0.0f, 0.0f, 1.0f),         // ej (z-axis)
+            25                                 // number of samples
         );
-        auto lightSphere = std::make_unique<Sphere>(lightPosition, 0.2f); // tiny sphere to represent the light
-        auto lightSphereInstance = std::make_unique<Instance>(std::move(lightSphere));
-        lightSphereInstance->setLight(pointLight.get());
-        scene->addObject(std::move(lightSphereInstance));
         
-        // // Add area light
-        // auto areaLight = std::make_unique<AreaLight>(
-        //     glm::vec3(0.0f, 4.0f, 0.0f),                    // position
-        //     glm::vec3(100.0f, 100.0f, 100.0f),   // power
-        //     glm::vec3(1.0f, 0.0f, 0.0f),         // ei (x-axis)
-        //     glm::vec3(0.0f, 0.0f, 1.0f),         // ej (z-axis)
-        //     25                                 // number of samples
-        // );
-        
-        // // Create a thin box to represent the area light
-        // auto areaLightBox = std::make_unique<Box>(
-        //     glm::vec3(-0.5f, -0.01f, -0.5f),     // bMin (thin in y direction)
-        //     glm::vec3(0.5f, 0.01f, 0.5f)         // bMax (thin in y direction)
-        // );
-        // auto areaLightInstance = std::make_unique<Instance>(std::move(areaLightBox));
-        // areaLightInstance->setLight(areaLight.get());
-        // areaLightInstance->translate(glm::vec3(0.0f, 4.0f, 0.0f));
-        // scene->addObject(std::move(areaLightInstance));
+        // Create a thin box to represent the area light
+        auto areaLightBox = std::make_unique<Box>(
+            glm::vec3(-0.5f, -0.01f, -0.5f),     // bMin (thin in y direction)
+            glm::vec3(0.5f, 0.01f, 0.5f)         // bMax (thin in y direction)
+        );
+        auto areaLightInstance = std::make_unique<Instance>(std::move(areaLightBox));
+        areaLightInstance->setLight(areaLight.get());
+        areaLightInstance->translate(glm::vec3(0.0f, 4.0f, 0.0f));
+        scene->addObject(std::move(areaLightInstance));
         
         // add objects to the scene
         auto sphere = std::make_unique<Sphere>(glm::vec3(0.5f, 1.0f, 0.0f), 1.0f); // larger red sphere
@@ -122,7 +107,7 @@ int main()
 
         // Create and run raytracer
         RayTracer raytracer;
-        raytracer.render(film.get(), camera.get(), scene.get(), numSamples);
+        raytracer.render(film.get(), camera.get(), scene.get(), numSamples, dMax);
 
         // Save the rendered image
         if (!film->savePPM("output.ppm")) {

@@ -1,7 +1,7 @@
 #include "raytracer.h"
 #include "glm/glm.hpp"
 
-void RayTracer::render(Film* film, Camera* camera, Scene* scene, float numSamples)
+void RayTracer::render(Film* film, Camera* camera, Scene* scene, float numSamples, int dMax)
 {
     for(int j = 0; j < film->getHeight(); j++)
     {
@@ -17,7 +17,7 @@ void RayTracer::render(Film* film, Camera* camera, Scene* scene, float numSample
                 Ray ray = camera->generateRay(sampledPixel.x, sampledPixel.y);
             
                 // trace ray and get color
-                color += scene->traceRay(ray);
+                color += scene->tracePath(ray, dMax);
             }                
             // Set pixel color
             film->setValue(i, j, color / numSamples);
