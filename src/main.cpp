@@ -1,4 +1,4 @@
-#include "raytracer.h"
+#include "pathtracer.h"
 #include "camera.h"
 #include "film.h"
 #include "scene.h"
@@ -35,24 +35,15 @@ int main()
 
         // create materials
         auto redMaterial = std::make_unique<PhongMaterial>(
-            glm::vec3(0.8f, 0.1f, 0.1f),    // diffuse
-            glm::vec3(0.5f, 0.5f, 0.5f),   // glossy
-            glm::vec3(0.1f, 0.1f, 0.1f),// ambient
-            10.0f                         // shininess
+            glm::vec3(0.8f, 0.1f, 0.1f)    // diffuse
         );
 
         auto blueMaterial = std::make_unique<PhongMaterial>(
-            glm::vec3(0.1f, 0.1f, 0.8f),    // diffuse 
-            glm::vec3(0.5f, 0.5f, 0.5f),    // glossy 
-            glm::vec3(0.1f, 0.1f, 0.1f),    // ambient 
-            100.0f                         // shininess
+            glm::vec3(0.1f, 0.1f, 0.8f)    // diffuse 
         );
 
         auto floorMaterial = std::make_unique<PhongMaterial>(
-            glm::vec3(0.8f, 0.8f, 0.8f),    // diffuse (almost white)
-            glm::vec3(0.1f, 0.1f, 0.1f),    // glossy (low highlight)
-            glm::vec3(0.01f, 0.01f, 0.01f), // ambient
-            10.0f                           // shininess
+            glm::vec3(0.8f, 0.8f, 0.8f)    // diffuse (almost white)
         );
 
         // add lights to the scene
@@ -72,6 +63,7 @@ int main()
             glm::vec3(-0.5f, -0.01f, -0.5f),     // bMin (thin in y direction)
             glm::vec3(0.5f, 0.01f, 0.5f)         // bMax (thin in y direction)
         );
+
         auto areaLightInstance = std::make_unique<Instance>(std::move(areaLightBox));
         areaLightInstance->setLight(areaLight.get());
         areaLightInstance->translate(glm::vec3(0.0f, 4.0f, 0.0f));
@@ -106,8 +98,8 @@ int main()
         scene->addObject(std::move(blueBoxInstance));
 
         // Create and run raytracer
-        RayTracer raytracer;
-        raytracer.render(film.get(), camera.get(), scene.get(), numSamples, dMax);
+        PathTracer pathtracer;
+        pathtracer.render(film.get(), camera.get(), scene.get(), numSamples, dMax);
 
         // Save the rendered image
         if (!film->savePPM("output.ppm")) {

@@ -1,14 +1,14 @@
-#ifndef RAYTRACER_H
-#define RAYTRACER_H
+#ifndef PATHTRACER_H
+#define PATHTRACER_H
 
 #include "scene.h"
 #include "camera.h"
 #include "film.h"
 
-class RayTracer
+class PathTracer
 {
     public:
-        RayTracer() {};
+        PathTracer() {};
         void render(Film* Film, Camera* camera, Scene* scene, float numSamples, int dMax);
 };
 #endif

@@ -1,7 +1,7 @@
-#include "raytracer.h"
+#include "pathtracer.h"
 #include "glm/glm.hpp"
 
-void RayTracer::render(Film* film, Camera* camera, Scene* scene, float numSamples, int dMax)
+void PathTracer::render(Film* film, Camera* camera, Scene* scene, float numSamples, int dMax)
 {
     for(int j = 0; j < film->getHeight(); j++)
     {
