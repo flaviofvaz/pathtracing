@@ -123,7 +123,7 @@ const glm::vec3 Scene::tracePath(Ray& ray, const int dMax) const
             if (i == 0)
             {
                 const Light* light = hit->getLight();
-                return light->GetIrradiance();
+                return light->getPower();
             }
             else
             {
