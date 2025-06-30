@@ -3,7 +3,7 @@
 #include "light.h"
 
 
-#define EPSILON 1e-3f
+#define EPSILON 1e-2f
 
 std::unique_ptr<Hit> Scene::computeIntersection(const Ray& ray) const
 {
@@ -36,7 +36,7 @@ const glm::vec3 Scene::HemisphereToGlobal(glm::vec3 p, glm::vec3 n, glm::vec3 wi
 
     glm::mat3 M = glm::mat3(t, b, n);
 
-    return glm::normalize(M * wih - p);
+    return glm::normalize(M * wih);
 }
 
 Light* Scene::SampleLight(float* lpdf) const
@@ -88,16 +88,18 @@ const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) co
     glm::vec3 s = light->getSample(&pdf, ns);
 
     glm::vec3 dif = s - p;
-    glm::vec3 wi = glm::normalize(dif);
+    float distance = glm::length(dif);
+    glm::vec3 wi = dif / distance;
+
     Ray ray = Ray(p + EPSILON * n, wi);
     auto hit = this->computeIntersection(ray);
-    if (!hit || !hit->isLight())
+    if (!hit || !hit->isLight() || hit->t < distance - EPSILON)
     {
         return glm::vec3(0.0f, 0.0f, 0.0f);
     }
     else
     {
-        float d = glm::dot(dif, dif);
+        float d = distance * distance;
         auto I = light->GetIrradiance();
         return (I * glm::max(0.0f, glm::dot(n, wi)) * glm::max(0.0f, glm::dot(ns, -wi))) / (d * lpdf * pdf);
     }

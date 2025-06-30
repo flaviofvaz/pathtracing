@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#define EPSILON 1e-3f
+#define EPSILON 1e-2f
 
 Sphere::Sphere(const glm::vec3& center, float radius)
     : center(center), radius(radius) {}
