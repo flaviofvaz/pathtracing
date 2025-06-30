@@ -123,22 +123,19 @@ const glm::vec3 Scene::tracePath(Ray& ray, const int dMax) const
             if (i == 0)
             {
                 const Light* light = hit->getLight();
-                return light->getPower();
+                L += beta * light->GetIrradiance();
             }
-            else
-            {
-                break;
-            }
+            break;
         } 
         else 
         {
             glm::vec3 p = hit->position;
             glm::vec3 n = hit->normal;
-            glm::vec3 Le = this->GetLightRadiance(p, n);
-            float pdf;
 
+            glm::vec3 Le = this->GetLightRadiance(p, n);
             L += Le * hit->getMaterial()->GetBRDF() * beta;
 
+            float pdf;
             glm::vec3 wih = hit->getMaterial()->GetSample(&pdf);
             glm::vec3 wi = this->HemisphereToGlobal(p, n, wih);
             
