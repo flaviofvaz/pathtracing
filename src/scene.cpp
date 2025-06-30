@@ -2,6 +2,9 @@
 #include "hit.h"
 #include "light.h"
 
+
+#define EPSILON 1e-4f
+
 std::unique_ptr<Hit> Scene::computeIntersection(const Ray& ray) const
 {
     std::unique_ptr<Hit> closestHit = nullptr;
@@ -72,6 +75,9 @@ Light* Scene::SampleLight(float* lpdf) const
             return lightInstances[i]->getLight();
         }
     }
+    
+    // fallback
+    return nullptr;
 }
 
 const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) const 
@@ -83,7 +89,7 @@ const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) co
 
     glm::vec3 dif = s - p;
     glm::vec3 wi = glm::normalize(dif);
-    Ray ray = Ray(p, wi);
+    Ray ray = Ray(p + EPSILON * n, wi);
     auto hit = this->computeIntersection(ray);
     if (!hit || !hit->isLight())
     {
@@ -115,7 +121,7 @@ const glm::vec3 Scene::tracePath(Ray& ray, const int dMax) const
             if (i == 0)
             {
                 const Light* light = hit->getLight();
-                return light->getPower();
+                return light->GetIrradiance();
             }
             else
             {
@@ -135,7 +141,7 @@ const glm::vec3 Scene::tracePath(Ray& ray, const int dMax) const
             glm::vec3 wi = this->HemisphereToGlobal(p, n, wih);
             
             beta *= hit->getMaterial()->GetBRDF() * glm::max(0.0f, glm::dot(n, wi)) / pdf;
-            ray = Ray(p, wi);
+            ray = Ray(p + EPSILON * n, wi);
         }
     }
 
