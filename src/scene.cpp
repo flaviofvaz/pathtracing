@@ -36,7 +36,7 @@ const glm::vec3 Scene::HemisphereToGlobal(glm::vec3 p, glm::vec3 n, glm::vec3 wi
 
     glm::mat3 M = glm::mat3(t, b, n);
 
-    return glm::normalize(M * wih - p);
+    return glm::normalize(M * wih);
 }
 
 Light* Scene::SampleLight(float* lpdf) const
