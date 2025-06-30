@@ -93,7 +93,7 @@ const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) co
 
     Ray ray = Ray(p + EPSILON * n, wi);
     auto hit = this->computeIntersection(ray);
-    if (!hit || !hit->isLight() || hit->t < distance - EPSILON)
+    if (!hit || !hit->isLight())
     {
         return glm::vec3(0.0f, 0.0f, 0.0f);
     }
