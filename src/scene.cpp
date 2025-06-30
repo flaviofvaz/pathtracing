@@ -3,7 +3,7 @@
 #include "light.h"
 
 
-#define EPSILON 1e-4f
+#define EPSILON 1e-3f
 
 std::unique_ptr<Hit> Scene::computeIntersection(const Ray& ray) const
 {
@@ -99,7 +99,7 @@ const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) co
     {
         float d = glm::dot(dif, dif);
         auto I = light->GetIrradiance();
-        return (I * glm::max(0.0f, glm::dot(n, wi)) * glm::max(0.0f, glm::dot(ns, -wi))) / (d * d * lpdf * pdf);
+        return (I * glm::max(0.0f, glm::dot(n, wi)) * glm::max(0.0f, glm::dot(ns, -wi))) / (d * lpdf * pdf);
     }
 }
 

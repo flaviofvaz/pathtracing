@@ -52,7 +52,7 @@ int main()
         // Add area light
         auto areaLight = std::make_unique<AreaLight>(
             glm::vec3(0.0f, 4.0f, 0.0f),                    // position
-            glm::vec3(100.0f, 100.0f, 100.0f),   // power
+            glm::vec3(10.0f, 10.0f, 10.0f),   // power
             glm::vec3(1.0f, 0.0f, 0.0f),         // ei (x-axis)
             glm::vec3(0.0f, 0.0f, 1.0f),         // ej (z-axis)
             25                                 // number of samples
@@ -60,8 +60,8 @@ int main()
         
         // Create a thin box to represent the area light
         auto areaLightBox = std::make_unique<Box>(
-            glm::vec3(-0.5f, -0.01f, -0.5f),     // bMin (thin in y direction)
-            glm::vec3(0.5f, 0.01f, 0.5f)         // bMax (thin in y direction)
+            glm::vec3(-0.5f, -0.05f, -0.5f),     // bMin (thin in y direction)
+            glm::vec3(0.5f, 0.05f, 0.5f)         // bMax (thin in y direction)
         );
 
         auto areaLightInstance = std::make_unique<Instance>(std::move(areaLightBox));
