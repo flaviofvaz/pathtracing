@@ -3,7 +3,7 @@
 #include "light.h"
 
 
-#define EPSILON 1e-2f
+#define EPSILON 1e-4f
 
 std::unique_ptr<Hit> Scene::computeIntersection(const Ray& ray) const
 {
@@ -36,7 +36,7 @@ const glm::vec3 Scene::HemisphereToGlobal(glm::vec3 p, glm::vec3 n, glm::vec3 wi
 
     glm::mat3 M = glm::mat3(t, b, n);
 
-    return glm::normalize(M * wih);
+    return glm::normalize(M * wih - p);
 }
 
 Light* Scene::SampleLight(float* lpdf) const
