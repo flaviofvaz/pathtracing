@@ -12,6 +12,7 @@ class Scene
 {
     private:
         std::vector<std::unique_ptr<Instance>> sceneObjects;
+        std::vector<Instance*> lightInstances;
         glm::vec3 ambientLight;
     public:
         Scene() = default;
@@ -25,11 +26,16 @@ class Scene
         Scene(Scene&&) = default;
         Scene& operator=(Scene&&) = default;
 
-        std::unique_ptr<Light> SampleLight(float* lpdf) const;
+        Light* SampleLight(float* lpdf) const;
         std::unique_ptr<Hit> computeIntersection(const Ray& ray) const;
         const glm::vec3 tracePath(Ray& ray, const int dMax) const;
 
-        void addObject(std::unique_ptr<Instance> sceneObject) {
+        void addObject(std::unique_ptr<Instance> sceneObject) 
+        {
+            if (sceneObject->isLight()) 
+            {
+                lightInstances.push_back(sceneObject.get());
+            }
             sceneObjects.push_back(std::move(sceneObject));
         }
 

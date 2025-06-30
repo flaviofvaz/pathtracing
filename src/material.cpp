@@ -20,7 +20,7 @@ glm::vec3 PhongMaterial::GetSample(float* pdf) const
     float y = rand1sqrt * glm::sin(angle);
     float z = glm::sqrt(1.0f - rand1);
 
-    *pdf = (glm::sqrt(1.0f - rand1)) / (glm::pi<float>());
+    *pdf = z / glm::pi<float>();
     return glm::vec3(x, y, z);
 }
 

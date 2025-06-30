@@ -23,7 +23,7 @@ glm::vec3 AreaLight::getSample(float* pdf, glm::vec3& ns) const
     return position + ei * Random() + ej * Random();
 }
 
-glm::vec3 AreaLight::GetIrraciance() const
+glm::vec3 AreaLight::GetIrradiance() const
 {
-    return glm::vec3(0.0f, 0.0f, 0.0f);
+    return this->power / this->getArea();
 }

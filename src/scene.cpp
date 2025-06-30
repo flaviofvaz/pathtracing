@@ -36,17 +36,49 @@ const glm::vec3 Scene::HemisphereToGlobal(glm::vec3 p, glm::vec3 n, glm::vec3 wi
     return glm::normalize(M * wih - p);
 }
 
-std::unique_ptr<Light> Scene::SampleLight(float* lpdf) const
+Light* Scene::SampleLight(float* lpdf) const
 {   
-    *lpdf = 1.0f; 
-    return 0;
+    if (lightInstances.empty()) {
+        *lpdf = 0.0f;
+        return nullptr;
+    }
+    
+    // calculate total power of all lights
+    float totalPower = 0.0f;
+    std::vector<float> lightPowers;
+    
+    for (const auto& instance : lightInstances) {
+        Light* light = instance->getLight();
+        glm::vec3 power = light->getPower();
+        float lightPower = power.x + power.y + power.z;
+        lightPowers.push_back(lightPower);
+        totalPower += lightPower;
+    }
+    
+    if (totalPower == 0.0f) {
+        *lpdf = 0.0f;
+        return nullptr;
+    }
+    
+    // sample based on power distribution
+    float randomValue = static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * totalPower;
+    float cumulativePower = 0.0f;
+    
+    for (size_t i = 0; i < lightInstances.size(); ++i) {
+        cumulativePower += lightPowers[i];
+        if (randomValue <= cumulativePower) {
+            // set lpdf = Pi / ∑Pj (power of selected light / total power)
+            *lpdf = lightPowers[i] / totalPower;
+            return lightInstances[i]->getLight();
+        }
+    }
 }
 
 const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) const 
 {   float lpdf = 0.0f;
     float pdf = 0.0f;
     glm::vec3 ns;
-    std::unique_ptr<Light> light = this->SampleLight(&lpdf);
+    Light* light = this->SampleLight(&lpdf);
     glm::vec3 s = light->getSample(&pdf, ns);
 
     glm::vec3 dif = s - p;
@@ -60,10 +92,7 @@ const glm::vec3 Scene::GetLightRadiance(const glm::vec3 p, const glm::vec3 n) co
     else
     {
         float d = glm::dot(dif, dif);
-
-        // NEED TO IMPLEMENT
-        auto I = light->GetIrraciance();
-
+        auto I = light->GetIrradiance();
         return (I * glm::max(0.0f, glm::dot(n, wi)) * glm::max(0.0f, glm::dot(ns, -wi))) / (d * d * lpdf * pdf);
     }
 }
